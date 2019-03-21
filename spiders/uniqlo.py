@@ -1,20 +1,28 @@
 import scrapy
+from scrapy import Request
 
 
-class QuotesSpider(scrapy.Spider):
+class UniqloSpider(scrapy.Spider):
     name = "quotes"
-
-    def start_requests(self):
-        urls = [
-            'http://quotes.toscrape.com/page/1/',
-            'http://quotes.toscrape.com/page/2/',
-        ]
-        for url in urls:
-            yield scrapy.Request(url=url, callback=self.parse)
+    start_urls = [
+        'https://www.uniqlo.com/sg/store/',
+    ]
 
     def parse(self, response):
-        page = response.url.split("/")[-2]
-        filename = 'quotes-%s.html' % page
-        with open(filename, 'wb') as f:
-            f.write(response.body)
-        self.log('Saved file %s' % filename)
+        links = response.css(
+            '#navHeader .cateNaviLink a::attr(href)').extract()
+        for link in links:
+            yield Request(url=link, callback=self.parse_itemLink)
+
+    def parse_itemLink(self, response):
+        itemLinks = response.css(".item > a::attr(href)").extract()
+        for itemLink in itemLinks:
+            yield Request(url=itemLink, callback=self.parse_item)
+
+    def parse_item(self, response):
+        try:
+            name = ''.join(response.css(
+                "#prodInfo > h1 > span ::text").extract())
+            print(name.strip())
+        except Exception as ex:
+            print("No name: " + response.url)
