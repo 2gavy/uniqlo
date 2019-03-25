@@ -2,7 +2,10 @@ import scrapy
 from scrapy import Request
 from scrapy import Selector
 from crawler.items import UniqloItem
+import pymongo
 import re
+import logging
+import copy
 
 
 class UniqloSpider(scrapy.Spider):
@@ -46,8 +49,8 @@ class UniqloSpider(scrapy.Spider):
             imageName = response.css(
                 '#prodImgDefault > img::attr(alt)').extract()
             description = ''.join(response.css(
-                '#prodDetail > div::text').extract() + " ").strip()
-            print("prodDetails: ", description)
+                '#prodDetail > div::text').extract()).strip()
+            # print("prodDetails: ", description)
             material = response.css(
                 '#prodDetail > div.content > dl.spec > dd:nth-child(2)::text').extract()
             care = response.css(
@@ -66,6 +69,7 @@ class UniqloSpider(scrapy.Spider):
             item["material"] = material
             item["care"] = care
             item["description"] = description
-            print(item)
+            # print(item)
+            yield item
         except Exception as ex:
             print("No name: " + response.url)
