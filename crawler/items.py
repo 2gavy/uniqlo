@@ -23,3 +23,5 @@ class UniqloItem(Item):
     material = Field()
     care = Field()
     description = Field()
+    originalLink = Field()
+    itemLink = Field()
