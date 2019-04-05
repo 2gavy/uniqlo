@@ -1,42 +1,31 @@
+# -*- coding: utf-8 -*-
 import scrapy
 from scrapy import Request
-from scrapy import Selector
-from crawler.items import UniqloItem
-import pymongo
-import re
-import logging
-import copy
 from scrapy_splash import SplashRequest
+from uniqlo.items import UniqloItem
+import pymongo
 
 
-class UniqloSpider(scrapy.Spider):
-    name = "items"
-    start_urls = [
-        'https://www.uniqlo.com/sg/store/',
-    ]
+class ProductsSpider(scrapy.Spider):
+    name = 'products'
+    allowed_domains = ['www.uniqlo.com']
+    start_urls = ['https://www.uniqlo.com/sg/store//']
 
     def parse(self, response):
         links = response.css(
             '#navHeader .cateNaviLink a::attr(href)').extract()
         for link in links:
-            yield SplashRequest(link, self.parse_itemLink, meta={'url': link}, args={'wait': 1})
-            # yield Request(url=link, meta={'url': link}, callback=self.parse_itemLink)
+            print(link)
+            yield SplashRequest(link, self.parse_categoryLink, meta={'url': link}, args={'wait': 1})
 
-    def parse_itemLink(self, response):
+    def parse_categoryLink(self, response):
         itemLinks = response.css(".item > a::attr(href)").extract()
         originalLink = response.meta['url']
         for itemLink in itemLinks:
-            # yield SplashRequest(itemLink, self.parse_item,
-            #                     args={'wait': 3},
-            #                     )
-            # yield Request(url=itemLink, callback=self.parse_item, meta={'splash': {'args': {'wait': '25'}, 'endpoint': 'render.html', 'originalLink': originalLink, 'itemLink': itemLink}})
-
             yield Request(url=itemLink, meta={'originalLink': originalLink, 'itemLink': itemLink}, callback=self.parse_item)
 
     def parse_item(self, response):
         item = UniqloItem()
-        # print("originalLink" + response.meta['originalLink'])
-        # print("itemLink" + response.meta['itemLink'])
 
         name = ''.join(response.css(
             "#prodInfo > h1 > span ::text").extract()).strip()
@@ -60,7 +49,6 @@ class UniqloSpider(scrapy.Spider):
             '#prodImgDefault > img::attr(alt)').extract()
         description = ''.join(response.css(
             '#prodDetail > div::text').extract()).strip()
-        # print("prodDetails: ", description)
         material = response.css(
             '#prodDetail > div.content > dl.spec > dd:nth-child(2)::text').extract()
         care = response.css(
@@ -81,5 +69,5 @@ class UniqloSpider(scrapy.Spider):
         item["description"] = description
         item["originalLink"] = response.meta['originalLink']
         item["itemLink"] = response.meta['itemLink']
-        # print(item)
+        print(item)
         yield item

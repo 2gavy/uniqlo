@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for tutorial project
+# Scrapy settings for uniqlo project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -11,16 +11,12 @@
 
 BOT_NAME = 'uniqlo'
 
-SPIDER_MODULES = ['tutorial.spiders']
-NEWSPIDER_MODULE = 'tutorial.spiders'
+SPIDER_MODULES = ['uniqlo.spiders']
+NEWSPIDER_MODULE = 'uniqlo.spiders'
 
-LOG_FILE_PIPELINE = './log-Pipeline.log'
-# LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
-# LOG_STDOUT = True
-# LOG_LEVEL = 'INFO'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'tutorial (+http://www.yourdomain.com)'
+#USER_AGENT = 'uniqlo (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -70,10 +66,16 @@ DOWNLOADER_MIDDLEWARES = {
 #    'scrapy.extensions.telnet.TelnetConsole': None,
 # }
 
+# Enable or disable extensions
+# See https://doc.scrapy.org/en/latest/topics/extensions.html
+# EXTENSIONS = {
+#    'scrapy.extensions.telnet.TelnetConsole': None,
+# }
+
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'crawler.pipelines.MongoPipeline': 2,
+    'uniqlo.pipelines.UniqloPipeline': 2,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
